@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "type": "array",
+  "name": "Sell Data during Covid",
+  "version": "1.0.0",
+  "properties": {
+    "data": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "case_per_day": {
+          "type": "number"
+        },
+        "Number_of_sell": {
+          "type": "number"
+        },
+        "Price_of_sell": {
+          "type": "number"
+        },
+        "eth_value": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "required": [
+    "date",
+    "metadata"
+  ]
+}

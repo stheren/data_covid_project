@@ -16,7 +16,7 @@ def sortListPerDate(dateList, valueList):
 ## ETH READER
 # https://www.nasdaq.com/market-activity/cryptocurrency/eth/historical
 EthPerDay = {}
-with open('HistoricalData_1642496997704.csv', newline='') as csvfile:
+with open('HistoricalData_1645971630465.csv', newline='') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=',')
     for row in spamreader:
         try:
@@ -79,48 +79,73 @@ for idx in range(22, 307):
 with open('owid-covid-data.json') as f:
     data = json.load(f)
 
-
-houseValue, houseDate = [], []
-ethValue, ethDate = [], []
-covidValue, covidDate = [], []
-sellValue, sellDate = [], []
-
+result = []
 countryData = data["FRA"]
 for e in tqdm(countryData['data'], desc="FRA"):
     date = e['date']
-    try:
-        houseValue.append(int(ValuePerDay['91'][date])/10620000)
-        houseDate.append(date)
-    except KeyError:
-        None
+    result.append({
+        "date": date,
+        "case_per_day": 0.0,
+        "Number_of_sell": 0.0,
+        "Price_of_sell": 0.0,
+        "eth_value": 0.0
 
+    })
     try:
-        covidValue.append(e['new_cases']/368379.0)
-        covidDate.append(date)
+        result[-1]["Price_of_sell"] = ValuePerDay['91'][date]
     except KeyError:
-        None
-
-    try:
-        ethValue.append(EthPerDay[e['date']]/4813.62)
-        ethDate.append(date)
-    except KeyError:
-        None
+        try:
+            result[-1]["Price_of_sell"] = result[-2]["Price_of_sell"]
+        except IndexError:
+            None
 
     try:
-        sellValue.append(SellPerDay[e['date']]/1211)
-        sellDate.append(date)
+        result[-1]['case_per_day'] = e['new_cases']
     except KeyError:
-        None
+        try:
+            result[-1]['case_per_day'] = result[-2]['case_per_day']
+        except IndexError:
+            None
 
-houseDate, houseValue = sortListPerDate(houseDate, houseValue)
-ethDate, ethValue = sortListPerDate(ethDate, ethValue)
-covidDate, covidValue = sortListPerDate(covidDate, covidValue)
-sellDate, sellValue = sortListPerDate(sellDate, sellValue)
+    try:
+        result[-1]["eth_value"] = EthPerDay[e['date']]
+    except KeyError:
+        try:
+            result[-1]["eth_value"] = result[-2]["eth_value"]
+        except IndexError:
+            None
 
-plt.plot(covidDate, covidValue, label="Case per day", linestyle=":")
-# plt.plot(ethDate, ethValue, label="Eth Value", linestyle="-")
-plt.plot(sellDate, sellValue, label="Number Sell", linestyle="-.")
-plt.plot(houseDate, houseValue, label="House Price")
+    try:
+        result[-1]["Number_of_sell"] = SellPerDay[e['date']]
+    except KeyError:
+        try:
+            result[-1]["Number_of_sell"] = result[-2]["Number_of_sell"]
+        except IndexError:
+            None
+
+with open('json_data_out.json', 'w') as outfile:
+    outfile.write(json.dumps(result))
+
+caseMax, ethMax, sellMax, priceMax = 0, 0, 0, 0
+for e in result:
+    caseMax = max(caseMax, e["case_per_day"])
+    ethMax = max(ethMax, e["eth_value"])
+    sellMax = max(sellMax, e["Number_of_sell"])
+    priceMax = max(priceMax, e["Price_of_sell"])
+
+dates, cases, eths, sells, prices = [], [], [], [], []
+
+for e in result:
+    dates.append(e["date"])
+    cases.append(e["case_per_day"] / caseMax)
+    eths.append(e["eth_value"] / ethMax)
+    sells.append(e["Number_of_sell"] / sellMax)
+    prices.append(e["Price_of_sell"] / priceMax)
+
+plt.plot(dates, cases, label="Case per day", linestyle=":")
+plt.plot(dates, eths, label="Eth Value", linestyle="-")
+plt.plot(dates, sells, label="Number Sell", linestyle="-.")
+plt.plot(dates, prices, label="House Price")
 
 plt.legend()
 plt.show()
