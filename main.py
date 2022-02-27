@@ -1,11 +1,10 @@
-import json
-import numpy as np
-import matplotlib.pyplot as plt
-import requests
-from tqdm import tqdm
-import datetime
 import csv
+import datetime
+import json
+
+import matplotlib.pyplot as plt
 import pandas as pd
+import tqdm
 
 
 def sortListPerDate(dateList, valueList):
