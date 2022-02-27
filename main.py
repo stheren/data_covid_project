@@ -36,6 +36,7 @@ def displayData(d):
 if len(sys.argv) > 1:
     with open('json_data_out.json') as f:
         displayData(json.load(f))
+    print("Success!")
     exit()
 
 
