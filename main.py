@@ -1,10 +1,42 @@
 import csv
 import datetime
 import json
+import sys
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import tqdm
+
+
+def displayData(d):
+    caseMax, ethMax, sellMax, priceMax = 0, 0, 0, 0
+    for elt in d:
+        caseMax = max(caseMax, elt["case_per_day"])
+        ethMax = max(ethMax, elt["eth_value"])
+        sellMax = max(sellMax, elt["Number_of_sell"])
+        priceMax = max(priceMax, elt["Price_of_sell"])
+
+    dates, cases, eths, sells, prices = [], [], [], [], []
+    for elt in d:
+        dates.append(elt["date"])
+        cases.append(elt["case_per_day"] / caseMax)
+        eths.append(elt["eth_value"] / ethMax)
+        sells.append(elt["Number_of_sell"] / sellMax)
+        prices.append(elt["Price_of_sell"] / priceMax)
+
+    plt.plot(dates, cases, label="Case per day", linestyle=":")
+    plt.plot(dates, eths, label="Eth Value", linestyle="-")
+    plt.plot(dates, sells, label="Number Sell", linestyle="-.")
+    plt.plot(dates, prices, label="House Price")
+
+    plt.legend()
+    plt.show()
+
+
+if len(sys.argv) > 1:
+    with open('json_data_out.json') as f:
+        displayData(json.load(f))
+    exit()
 
 
 def sortListPerDate(dateList, valueList):
@@ -125,26 +157,4 @@ for e in tqdm(countryData['data'], desc="FRA"):
 with open('json_data_out.json', 'w') as outfile:
     outfile.write(json.dumps(result))
 
-caseMax, ethMax, sellMax, priceMax = 0, 0, 0, 0
-for e in result:
-    caseMax = max(caseMax, e["case_per_day"])
-    ethMax = max(ethMax, e["eth_value"])
-    sellMax = max(sellMax, e["Number_of_sell"])
-    priceMax = max(priceMax, e["Price_of_sell"])
-
-dates, cases, eths, sells, prices = [], [], [], [], []
-
-for e in result:
-    dates.append(e["date"])
-    cases.append(e["case_per_day"] / caseMax)
-    eths.append(e["eth_value"] / ethMax)
-    sells.append(e["Number_of_sell"] / sellMax)
-    prices.append(e["Price_of_sell"] / priceMax)
-
-plt.plot(dates, cases, label="Case per day", linestyle=":")
-plt.plot(dates, eths, label="Eth Value", linestyle="-")
-plt.plot(dates, sells, label="Number Sell", linestyle="-.")
-plt.plot(dates, prices, label="House Price")
-
-plt.legend()
-plt.show()
+displayData(result)
