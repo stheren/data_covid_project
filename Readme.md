@@ -38,6 +38,3 @@ You need to download data file from :
 ```bash
 Python3.9 main.py
 ```
-
-### Issues
-Thank to [zpaul91](https://github.com/zpaul91) for [Wrong nb mails #1](https://github.com/stheren/EmailReader/issues/1)
