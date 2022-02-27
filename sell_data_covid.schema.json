@@ -28,6 +28,9 @@
   },
   "required": [
     "date",
-    "metadata"
+    "case_per_day", 
+    "Number_of_sell", 
+    "Price_of_sell",
+    "eth_value"
   ]
 }
